@@ -1,0 +1,17 @@
+program 
+var i,j2: int,
+	b: bool;
+begin
+  i:=3;
+  b:= true;
+  if false then i:=1 else write(1);
+  while i>0 do
+  begin
+   write(i);
+   i:= i-1
+  end;
+
+begin
+ write(10500)
+end
+end@

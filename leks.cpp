@@ -17,7 +17,9 @@ enum type_of_lex {
 	LEX_SLASH, LEX_LSS, LEX_GTR,			// / < >
 	LEX_LEQ, LEX_GEQ, LEX_EQ,				// <= >= ==
 	LEX_NEQ, LEX_LPAREN, RPAREN,			// != (  )
-	LEX_COLON, LEX_PERCENT					// : %
+	LEX_COLON, LEX_PERCENT,					// : %
+	LEX_NUM,
+	LEX_ID
 };
 
 
@@ -173,7 +175,96 @@ Scanner::dlms[] {
 	LEX_COLON, LEX_PERCENT					// : %
 };
 
+Lex
+Scanner::get_lex() {
+	int d,j;
 
+	CS = H;
+	do {
+		switch(CS){
+			case H:
+				if (c == ' ' || c == '\n' || c == '\t' || c == '\r')
+					gc();
+				else if (isalpha(c)){
+					clear();
+					add();
+					gc();
+					CS = IDENT;
+				}
+				else if (isdigit(c)){
+					d = c - '0';
+					gc();
+					CS = NUMB;
+				}
+				else if (c == '"'){
+					clear();
+					gc();
+					CS = STRN;
+				}
+				else if (c == '<' || c == '>' || c == '='){
+					clear();
+					add();
+					gc();
+					CS = ALE;
+				}
+				else if (c == '!'){
+					clear();
+					add();
+					gc();
+					CS = NEQ;
+				}
+				else if (c == '/'){
+					clear();
+					add();
+					gc();
+					CS = COMDEL;
+				}
+				else 
+					CS = DELIM;
+					cout << "delim";
+				break;
+
+			case IDENT:
+				if (isalpha(c) || isdigit(c)){
+					add();
+					gc();
+				}
+				else if (j = look(buf, TW))
+					cout << Lex(words[j], j) << " ";
+				else {
+					j = TID.put(buf);
+					cout << Lex(LEX_ID, j);
+				}
+				break;
+
+			case NUMB:
+				if (isdigit(c)){
+					d = d*10 + c-'0';
+					gc();
+				}
+				else
+					cout << Lex(LEX_NUM, d);
+				break;
+
+			case STRN:
+				break;
+
+			case ALE:
+				break;
+
+			case NEQ:
+				break;
+
+			case COMDEL:
+				break;
+
+			case DELIM:
+				break;
+		}
+	}//end switch
+	while(true);
+	
+}
 
 
 int main() {
@@ -187,4 +278,5 @@ int main() {
 		cout << scan1.TD[i]<< endl;
 		i++;
 	}
+	cout << scan1.get_lex();
 }
