@@ -229,9 +229,10 @@ Scanner::get_lex() {
 					add();
 					gc();
 				}
-				else if (j = look(buf, TW))
+				else if (j = look(buf, TW)){
 					cout << Lex(words[j], j) << " ";
 					CS = H;
+				}
 				else {
 					j = TID.put(buf);
 					cout << Lex(LEX_ID, j);
@@ -312,7 +313,7 @@ Scanner::get_lex() {
 				break;
 			case DELIM:
 				if (c == '*' || c == '+' || c == '-' || c == '/' || c == ',' ||
-					c == ';' || c == '(' || c == ')' || c == '{' || c == '}' || ){
+					c == ';' || c == '(' || c == ')' || c == '{' || c == '}'){
 					clear();
 					add();
 					gc();
@@ -320,7 +321,9 @@ Scanner::get_lex() {
 					cout << Lex(dlms[j], j);
 					CS = H;
 				}
-				else {
+				else{
+					throw("error");
+				}
 				break;
 		}
 	}//end switch
