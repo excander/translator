@@ -109,7 +109,7 @@ Tabl_ident TID(100);
 
 class Scanner {
 public:
-			enum state { H, IDENT, NUMB, STRN, ALE, NEQ, COMDEL, DELIM };
+			enum state { H, IDENT, NUMB, STRN, ALE, NEQ, COMDEL, COM, ZVZ, DELIM};
 	static char* TW[];
 	static type_of_lex words[];
 	static char* TD[];
@@ -231,9 +231,11 @@ Scanner::get_lex() {
 				}
 				else if (j = look(buf, TW))
 					cout << Lex(words[j], j) << " ";
+					CS = H;
 				else {
 					j = TID.put(buf);
 					cout << Lex(LEX_ID, j);
+					CS = H;
 				}
 				break;
 
@@ -244,21 +246,81 @@ Scanner::get_lex() {
 				}
 				else
 					cout << Lex(LEX_NUM, d);
+					CS = H;
 				break;
 
 			case STRN:
 				break;
 
 			case ALE:
+				if (c == '='){
+					add();
+					gc();
+					j = look(buf, TD);
+					cout << Lex(dlms[j], j);
+					CS = H;
+				}
+				else {
+					j = look(buf, TD);
+					cout << Lex(dlms[j], j);
+					CS = H;	
+				}
 				break;
 
 			case NEQ:
+				if (c == '='){
+					add();
+					gc();
+					j = look(buf, TD);
+					cout << Lex(dlms[j], j);
+					CS = H;
+				}
+				else {
+					throw "error";
+				}
 				break;
 
 			case COMDEL:
+				if (c == '*'){
+					gc();
+					CS = COM;
+				}
+				else {
+					j = look(buf, TD);
+					cout << Lex(dlms[j], j);
+					CS = H;
+				}
 				break;
 
+			case COM:
+				if (c == '*'){
+					gc();
+					CS = ZVZ;
+				}
+				else 
+					gc();
+				break;
+			case ZVZ:
+				if (c == '/'){
+					gc();
+					CS = H;
+				}
+				else {
+					gc();
+					CS = COM;
+				}
+				break;
 			case DELIM:
+				if (c == '*' || c == '+' || c == '-' || c == '/' || c == ',' ||
+					c == ';' || c == '(' || c == ')' || c == '{' || c == '}' || ){
+					clear();
+					add();
+					gc();
+					j = look(buf, TD);
+					cout << Lex(dlms[j], j);
+					CS = H;
+				}
+				else {
 				break;
 		}
 	}//end switch
