@@ -1,6 +1,2 @@
-program asd asd asf int int
-23
-asdf
-((( !=
-
-)
+program 
+/* 1 2 

@@ -333,6 +333,9 @@ Scanner::get_lex() {
                     gc();
                     CS = ZVZ;
                 }
+                else if (c == EOF){
+                    throw "unexpected EOF (in comment)";
+                }
                 else
                     gc();
                 break;
@@ -340,6 +343,9 @@ Scanner::get_lex() {
                 if (c == '/'){
                     gc();
                     CS = H;
+                }
+                else if (c == EOF){
+                    throw "unexpected EOF (in comment)";
                 }
                 else {
                     gc();
@@ -366,10 +372,62 @@ Scanner::get_lex() {
 
 }
 
-class Parser{
+// class Parser{
+// 	Lex curr_lex;
+// 	type_of_lex c_type;
+// 	int c_val;
+// 	string str_val; /////////////////// ??
+// 	Scanner scan;
 
-}
+// 	void Programma();
+// 	void Opisaniya();
+// 	void Opisanie();
+// 	void Tip();
+// 	void Peremennaya();
+// 	void Konstanta();
+// 	void Celochislennaya();
+// 	void Znak();
+// 	void Strokovaya();
+// 	void Operatori();
+// 	void Operator();
+// 	void SostavnoyOperator();
+// 	void OperatorViragenie();
 
+// 	void gl(){
+// 		curr_lex = scan.get_lex();
+// 		c_type = curr_lex.get_type();
+// 		c_val = curr_lex.get_value();
+// 	};
+
+// public:
+// 	Parser(const char *program): scan(program), prog(1000){}
+// 	void analyze();
+// };
+
+// void Parser::analyze(){
+// 	gl();
+// 	Programma();
+// 	cout << endl << "Yes!!!" << endl;
+// }
+
+// void Parrser::Programma(){
+// 	if (c_type == LEX_PROGRAM)
+// 		gl();
+// 	else
+// 		throw curr_lex;
+// 	if (c_type == LEX_LBRACE)
+// 		gl();
+// 	else
+// 		throw curr_lex;
+// 	Opisaniya();
+// 	Operatori();
+// 	if (c_type == LEX_RBRACE;)
+// 		gl();
+// 	else
+// 		throw curr_lex;
+// 	if (c_type != LEX_EOF)
+// 		throw curr_lex;
+// }
 
 int main() {
     // Lex l;
