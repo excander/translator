@@ -9,7 +9,7 @@ enum type_of_lex {
     LEX_IF, LEX_ELSE, LEX_WHILE, 			// 4 5 6
     LEX_READ, LEX_WRITE, LEX_NOT, 			// 7 8 9
     LEX_AND, LEX_OR, LEX_BREAK, 			// 10 11 12
-    LEX_CASE, LEX_OF, LEX_END, LEX_DO,		// 13 14 15
+    LEX_CASE, LEX_OF, LEX_END, LEX_DO,		// 13 14 15 16
 
     LEX_LBRACE, LEX_RBRACE, LEX_SEMICOLON, 	// { } ;
     LEX_COMMA, LEX_ASSIGN, LEX_PLUS,		// , = +
@@ -19,9 +19,29 @@ enum type_of_lex {
     LEX_NEQ, LEX_LPAREN, RPAREN,			// != (  )
     LEX_COLON, LEX_PERCENT,					// : %
     LEX_NUM,
-    LEX_ID
+    LEX_ID,
+    LEX_EOF
 };
 
+string str_lex [100] = {
+    "LEX_NULL", 								// 0
+    "LEX_PROGRAM", "LEX_INT", "LEX_STRING", 	// 1 2 3
+    "LEX_IF", "LEX_ELSE", "LEX_WHILE", 			// 4 5 6
+    "LEX_READ", "LEX_WRITE", "LEX_NOT", 		// 7 8 9
+    "LEX_AND", "LEX_OR", "LEX_BREAK", 			// 10 11 12
+    "LEX_CASE", "LEX_OF", "LEX_END", "LEX_DO",	// 13 14 15 16
+
+    "LEX_LBRACE", "LEX_RBRACE", "LEX_SEMICOLON",// { } ;
+    "LEX_COMMA", "LEX_ASSIGN", "LEX_PLUS",		// , = +
+    "LEX_MINUS", "LEX_QUOTE", "LEX_TIMES", 		// - " *
+    "LEX_SLASH", "LEX_LSS", "LEX_GTR",			// / < >
+    "LEX_LEQ", "LEX_GEQ", "LEX_EQ",				// <= >= ==
+    "LEX_NEQ", "LEX_LPAREN", "RPAREN",			// != (  )
+    "LEX_COLON", "LEX_PERCENT",					// : %
+    "LEX_NUM",
+    "LEX_ID",
+    "LEX_EOF"
+};	
 
 /////////////////////////  Класс Lex  //////////////////////////
 
@@ -162,7 +182,7 @@ type_of_lex
 };
 
 char *
-        Scanner::TD[] { "", "{", "}", ",", "=", "+", "-", "\"", "*", "/", "<", ">", "<=", ">=", "==", "!=", "(", ")", ":", "%", NULL};
+        Scanner::TD[] { "", "{", "}", ";", ",", "=", "+", "-", "\"", "*", "/", "<", ">", "<=", ">=", "==", "!=", "(", ")", ":", "%", NULL};
 type_of_lex
         Scanner::dlms[] {
         LEX_NULL,
@@ -219,12 +239,12 @@ Scanner::get_lex() {
                     gc();
                     CS = COMDEL;
                 }
-                else if (c == '@'){
-                    return LEX_PERCENT; ///////////////////////////////////
+                else if (c == EOF){
+                    return Lex(LEX_EOF, LEX_EOF); ///////////////////////////////////
                     break;
                 }
                 else {
-                    cout << "delim";
+                    // cout << "delim";
                     CS = DELIM;}
                 break;
 
@@ -234,12 +254,12 @@ Scanner::get_lex() {
                     gc();
                 }
                 else if (j = look(buf, TW)){
-                    cout << Lex(words[j], j) << " ";
+                    return Lex(words[j], j);
                     CS = H;
                 }
                 else {
                     j = TID.put(buf);
-                    cout << Lex(LEX_ID, j);
+                    return Lex(LEX_ID, j);
                     CS = H;
                 }
                 break;
@@ -249,12 +269,23 @@ Scanner::get_lex() {
                     d = d*10 + c-'0';
                     gc();
                 }
-                else
-                    cout << Lex(LEX_NUM, d);
-                CS = H;
+                else{
+                    return Lex(LEX_NUM, d);
+                	CS = H;
+                }
                 break;
 
             case STRN:
+            	// if (isprint(c)){
+            	// 	add();
+            	// 	gc();
+            	// }
+            	// else if  (c == '"'){
+            	// 	j = 
+            	// }
+            	// else {
+            	// 	gc();
+            	// }
                 break;
 
             case ALE:
@@ -262,12 +293,12 @@ Scanner::get_lex() {
                     add();
                     gc();
                     j = look(buf, TD);
-                    cout << Lex(dlms[j], j);
+                    return Lex(dlms[j], j);
                     CS = H;
                 }
                 else {
                     j = look(buf, TD);
-                    cout << Lex(dlms[j], j);
+                    return Lex(dlms[j], j);
                     CS = H;
                 }
                 break;
@@ -277,7 +308,7 @@ Scanner::get_lex() {
                     add();
                     gc();
                     j = look(buf, TD);
-                    cout << Lex(dlms[j], j);
+                    return Lex(dlms[j], j);
                     CS = H;
                 }
                 else {
@@ -292,7 +323,7 @@ Scanner::get_lex() {
                 }
                 else {
                     j = look(buf, TD);
-                    cout << Lex(dlms[j], j);
+                    return Lex(dlms[j], j);
                     CS = H;
                 }
                 break;
@@ -322,7 +353,7 @@ Scanner::get_lex() {
                     add();
                     gc();
                     j = look(buf, TD);
-                    cout << Lex(dlms[j], j);
+                    return Lex(dlms[j], j);
                     CS = H;
                 }
                 else{
@@ -341,11 +372,21 @@ int main() {
     // Ident id1;
     // id1.put_strval("asd");
     // cout << id1.get_strval() << endl;
-    Scanner scan1("input.txt");
-    // int i = 1;
-    // while(scan1.TD[i]){
-    // 	cout << scan1.TD[i]<< endl;
-    // 	i++;
-    // }
-    scan1.get_lex();
+	Scanner scan1("input.txt");
+    
+    try {
+	    Lex cur_lex;
+	    int i = 1;
+	    cur_lex = scan1.get_lex();
+	    while (cur_lex.get_type() != LEX_EOF){
+	    	cout << cur_lex << " <=> " << str_lex[cur_lex.get_type()] << endl;
+	    	cur_lex = scan1.get_lex();
+	    	i++;
+	    }
+    }
+    catch (char const* str){
+    	cout << str << endl;
+	}
+
+
 }
