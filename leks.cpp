@@ -366,6 +366,10 @@ Scanner::get_lex() {
 
 }
 
+class Parser{
+
+}
+
 
 int main() {
     // Lex l;
@@ -375,12 +379,12 @@ int main() {
 	Scanner scan1("input.txt");
     
     try {
-	    Lex cur_lex;
+	    Lex lex1;
 	    int i = 1;
-	    cur_lex = scan1.get_lex();
-	    while (cur_lex.get_type() != LEX_EOF){
-	    	cout << cur_lex << " <=> " << str_lex[cur_lex.get_type()] << endl;
-	    	cur_lex = scan1.get_lex();
+	    lex1 = scan1.get_lex();
+	    while (lex1.get_type() != LEX_EOF){
+	    	cout << lex1 << " <=> " << str_lex[lex1.get_type()] << endl;
+	    	lex1 = scan1.get_lex();
 	    	i++;
 	    }
     }
