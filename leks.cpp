@@ -516,13 +516,56 @@ void Parser::Operator(){
 		Operator();
 	}
 	else if (c_type == LEX_WHILE){
-
+		gl();
+		if (c_type == LEX_LPAREN)
+			gl();
+		else
+			throw curr_lex;
+		Viragenie();
+		if (c_type == LEX_RPAREN)
+			gl();
+		else
+			throw curr_lex;
+		Operator();
 	}
 	else if (c_type == LEX_READ){
-
+		gl();
+		if (c_type == LEX_LPAREN)
+			gl();
+		else
+			throw curr_lex;
+		if (c_type == LEX_ID)
+			gl();
+		else
+			throw curr_lex;
+		if (c_type == LEX_RPAREN)
+			gl();
+		else
+			throw curr_lex;
+		if (c_type == LEX_SEMICOLON)
+			gl();
+		else
+			throw curr_lex;
 	}
 	else if (c_type == LEX_WRITE){
-
+		gl();
+		if (c_type == LEX_LPAREN)
+			gl();
+		else
+			throw curr_lex;
+		Viragenie();
+		while (c_type == LEX_COMMA){
+			gl();
+			Viragenie();
+		}
+		if (c_type == LEX_RPAREN)
+			gl();
+		else
+			throw curr_lex;
+		if (c_type == LEX_SEMICOLON)
+			gl();
+		else
+			throw curr_lex;
 	}
 	else if (c_type == LEX_LBRACE){   // SostavnoyOperator()
 		gl();
