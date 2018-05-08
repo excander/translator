@@ -1,2 +1,4 @@
-program 
-/* 1 2 
+program {
+int ke;
+int j, k, t=-3, p, sdf=10;
+}

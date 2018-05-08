@@ -372,83 +372,151 @@ Scanner::get_lex() {
 
 }
 
-// class Parser{
-// 	Lex curr_lex;
-// 	type_of_lex c_type;
-// 	int c_val;
-// 	string str_val; /////////////////// ??
-// 	Scanner scan;
+class Parser{
+	Lex curr_lex;
+	type_of_lex c_type;
+	int c_val;
+	string str_val; /////////////////// ??
+	Scanner scan;
 
-// 	void Programma();
-// 	void Opisaniya();
-// 	void Opisanie();
-// 	void Tip();
-// 	void Peremennaya();
-// 	void Konstanta();
-// 	void Celochislennaya();
-// 	void Znak();
-// 	void Strokovaya();
-// 	void Operatori();
-// 	void Operator();
-// 	void SostavnoyOperator();
-// 	void OperatorViragenie();
+	void Programma();
+	void Opisaniya();
+	// void Opisanie();
+	// void Tip();
+	void Peremennaya();
+	void Konstanta();
+	void Celochislennaya();
+	void Znak();
+	void Strokovaya();
+	void Operatori();
+	void Operator();
+	void SostavnoyOperator();
+	void OperatorViragenie();
 
-// 	void gl(){
-// 		curr_lex = scan.get_lex();
-// 		c_type = curr_lex.get_type();
-// 		c_val = curr_lex.get_value();
-// 	};
+	void gl(){
+		curr_lex = scan.get_lex();
+		c_type = curr_lex.get_type();
+		c_val = curr_lex.get_value();
+	};
 
-// public:
-// 	Parser(const char *program): scan(program), prog(1000){}
-// 	void analyze();
-// };
+public:
+	Parser(const char *program): scan(program){}
+	void analyze();
+};
 
-// void Parser::analyze(){
-// 	gl();
-// 	Programma();
-// 	cout << endl << "Yes!!!" << endl;
-// }
+void Parser::analyze(){
+	gl();
+	Programma();
+	cout << endl << "Yes!!!" << endl;
+}
 
-// void Parrser::Programma(){
-// 	if (c_type == LEX_PROGRAM)
-// 		gl();
-// 	else
-// 		throw curr_lex;
-// 	if (c_type == LEX_LBRACE)
-// 		gl();
-// 	else
-// 		throw curr_lex;
-// 	Opisaniya();
-// 	Operatori();
-// 	if (c_type == LEX_RBRACE;)
-// 		gl();
-// 	else
-// 		throw curr_lex;
-// 	if (c_type != LEX_EOF)
-// 		throw curr_lex;
-// }
+void Parser::Programma(){
+	if (c_type == LEX_PROGRAM)
+		gl();
+	else
+		throw curr_lex;
+	if (c_type == LEX_LBRACE)
+		gl();
+	else
+		throw curr_lex;
+	Opisaniya();
+	Operatori();
+	if (c_type == LEX_RBRACE)
+		gl();
+	else
+		throw curr_lex;
+	if (c_type != LEX_EOF)
+		throw curr_lex;
+}
+
+void Parser::Opisaniya(){
+	while (c_type == LEX_INT || c_type == LEX_STRING){
+		gl();
+		Peremennaya();
+		while (c_type == LEX_COMMA){
+			gl();
+			Peremennaya();
+		}
+		if (c_type == LEX_SEMICOLON)
+			gl();
+		else 
+			throw curr_lex;
+	}
+}
+
+// void Parser::Opisanie(){}
+// void Parser::Tip(){}
+void Parser::Peremennaya(){
+	if (c_type == LEX_ID)
+		gl();
+	else
+		throw curr_lex;
+	if (c_type == LEX_ASSIGN){
+		gl();
+		Konstanta();
+	}
+}
+void Parser::Konstanta(){
+	if (c_type == LEX_PLUS || c_type == LEX_MINUS){
+		gl();
+		Celochislennaya();
+	}
+	else if (c_type == LEX_NUM){
+		Celochislennaya();
+	}
+	else if (c_type == LEX_QUOTE){
+		// <--
+	}
+	else
+		throw curr_lex;
+}
+void Parser::Celochislennaya(){
+	if (c_type == LEX_NUM)
+		gl();
+	else 
+		throw curr_lex;
+}
+// void Parser::Znak(){}
+void Parser::Strokovaya(){}
+void Parser::Operatori(){}
+void Parser::Operator(){}
+void Parser::SostavnoyOperator(){}
+void Parser::OperatorViragenie(){}
 
 int main() {
     // Lex l;
     // Ident id1;
     // id1.put_strval("asd");
     // cout << id1.get_strval() << endl;
-	Scanner scan1("input.txt");
-    
-    try {
-	    Lex lex1;
-	    int i = 1;
-	    lex1 = scan1.get_lex();
-	    while (lex1.get_type() != LEX_EOF){
-	    	cout << lex1 << " <=> " << str_lex[lex1.get_type()] << endl;
-	    	lex1 = scan1.get_lex();
-	    	i++;
-	    }
-    }
-    catch (char const* str){
-    	cout << str << endl;
-	}
 
+
+	// Scanner scan1("input.txt");
+ //    try {
+	//     Lex lex1;
+	//     int i = 1;
+	//     lex1 = scan1.get_lex();
+	//     while (lex1.get_type() != LEX_EOF){
+	//     	cout << lex1 << " <=> " << str_lex[lex1.get_type()] << endl;
+	//     	lex1 = scan1.get_lex();
+	//     	i++;
+	//     }
+ //    }
+ //    catch (char const* str){
+ //    	cout << str << endl;
+	// }
+
+	Parser pars1("input.txt");
+	try {
+		pars1.analyze();
+	}
+	catch (char const* str){
+    	cout << str << endl;
+    }
+    catch (Lex l)
+  {
+    cout << "unexpected lexeme";
+    cout << l << " <=> " << str_lex[l.get_type()] << endl;
+    return 1;
+  }
 
 }
