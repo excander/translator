@@ -386,13 +386,17 @@ class Parser{
 	void Peremennaya();
 	void Konstanta();
 	void Celochislennaya();
-	void Znak();
+	// void Znak();
 	void Strokovaya();
 	void Operatori();
 	void Operator();
 	void SostavnoyOperator();
 	void OperatorViragenie();
 	void Viragenie();
+
+	void E1();
+	void T();
+	void F();
 
 	void gl(){
 		curr_lex = scan.get_lex();
@@ -486,9 +490,8 @@ void Parser::Operatori(){
 		c_type == LEX_WHILE || 
 		c_type == LEX_READ || 
 		c_type == LEX_WRITE || 
-		c_type == LEX_LBRACE 
-		// || ОПЕРАТОР_ВЫРАЖЕНИЕ
-		){
+		c_type == LEX_LBRACE ||
+		c_type == LEX_ID){
 			Operator();
 	}
 }
@@ -521,7 +524,7 @@ void Parser::Operator(){
 	else if (c_type == LEX_WRITE){
 
 	}
-	else if (c_type == LEX_LBRACE){
+	else if (c_type == LEX_LBRACE){   // SostavnoyOperator()
 		gl();
 		Operatori();
 		if (c_type == LEX_RBRACE)
@@ -533,7 +536,7 @@ void Parser::Operator(){
 		gl();
 		if (c_type == LEX_ASSIGN){
 			gl();
-			// E();
+			OperatorViragenie();
 		}
 		else
 			throw curr_lex;
@@ -542,9 +545,68 @@ void Parser::Operator(){
 		OperatorViragenie();
 }
 
-void Parser::SostavnoyOperator(){}
-void Parser::OperatorViragenie(){}
-void Parser::Viragenie(){}
+// void Parser::SostavnoyOperator(){}
+void Parser::OperatorViragenie(){
+	Viragenie();
+	if (c_type == LEX_SEMICOLON)
+		gl();
+	else
+		throw curr_lex;
+}
+
+void Parser::Viragenie(){
+	E1();
+	if (c_type == LEX_EQ || c_type == LEX_LSS || c_type == LEX_GTR ||
+		c_type == LEX_LEQ || c_type == LEX_GEQ || c_type == LEX_NEQ ){
+			gl();
+			E1();
+	}
+}
+
+void Parser::E1 ()
+{
+  T();
+  while ( c_type == LEX_PLUS || c_type == LEX_MINUS || c_type == LEX_OR){
+    gl();
+    T();
+  }
+}
+ 
+void Parser::T ()
+{
+  F();
+  while ( c_type == LEX_TIMES || c_type == LEX_SLASH || c_type == LEX_AND) {
+   gl();
+   F();
+  }
+}
+ 
+void Parser::F () 
+{
+  if ( c_type == LEX_ID ){
+    gl();
+  }
+  else if ( c_type == LEX_NUM ){
+    gl();
+  }
+  else if (c_type == LEX_NOT){
+    gl(); 
+    F(); 
+  }
+  else if ( c_type == LEX_LPAREN ) 
+  {
+    gl(); 
+	Viragenie();
+    if ( c_type == LEX_RPAREN)
+      gl();
+    else 
+      throw curr_lex;
+  }
+  else 
+    throw curr_lex;
+}
+
+
 
 int main() {
     // Lex l;
