@@ -20,7 +20,8 @@ enum type_of_lex {
     LEX_COLON, LEX_PERCENT,					// : %
     LEX_NUM,
     LEX_ID,
-    LEX_EOF
+    LEX_EOF,
+    LEX_LITERA
 };
 
 string str_lex [100] = {
@@ -40,7 +41,8 @@ string str_lex [100] = {
     "LEX_COLON", "LEX_PERCENT",					// : %
     "LEX_NUM",
     "LEX_ID",
-    "LEX_EOF"
+    "LEX_EOF",
+    "LEX_LITERA"
 };	
 
 /////////////////////////  Класс Lex  //////////////////////////
@@ -121,9 +123,36 @@ int Tabl_ident::put(char *buf){
     return top-1;
 }
 
+//////////////////////  Класс Tabl_liter  ///////////////////////
+
+class Tabl_liter{
+    string *p;
+    int size;
+    int top;
+
+public:
+    Tabl_liter(int maxsize){
+        p = new string[maxsize];
+        top = 1;
+    }
+    ~Tabl_liter () { delete []p; }
+    string& operator[] (int k) { return p[k]; }
+    int put (char *);
+};
+
+int Tabl_liter::put(char *buf){
+    // for(int j=1; j<top; j++)
+    //     if ( !strcmp(p[j].get_name(), buf) )
+    //         return j;
+    p[top] = string(buf);
+    top++;
+    return top-1;
+}
+
 ////////////////////////////////////////////////////////////////////
 
 Tabl_ident TID(100);
+Tabl_liter TLIT(100);
 
 /////////////////////  Класс Scanner  //////////////////////////////
 
@@ -276,16 +305,18 @@ Scanner::get_lex() {
                 break;
 
             case STRN:
-            	// if (isprint(c)){
-            	// 	add();
-            	// 	gc();
-            	// }
-            	// else if  (c == '"'){
-            	// 	j = 
-            	// }
-            	// else {
-            	// 	gc();
-            	// }
+            	if (isprint(c) && c!= '"'){
+            		add();
+            		gc();
+            	}
+            	else if  (c == '"'){
+            		gc();
+            		j = TLIT.put(buf);
+            		return Lex(LEX_LITERA, j);
+            	}
+            	else {
+            		gc();
+            	}
                 break;
 
             case ALE:
@@ -470,7 +501,9 @@ void Parser::Konstanta(){
 		Celochislennaya();
 	}
 	else if (c_type == LEX_QUOTE){
-		// <--
+	}
+	else if (c_type == LEX_LITERA){
+		Strokovaya();
 	}
 	else
 		throw curr_lex;
@@ -484,7 +517,12 @@ void Parser::Celochislennaya(){
 }
 
 // void Parser::Znak(){}
-void Parser::Strokovaya(){}
+void Parser::Strokovaya(){
+	if (c_type == LEX_LITERA)
+		gl();
+	else 
+		throw curr_lex;
+}
 void Parser::Operatori(){
 	while (c_type == LEX_IF || 
 		c_type == LEX_WHILE || 
