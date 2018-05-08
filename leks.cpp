@@ -16,7 +16,7 @@ enum type_of_lex {
     LEX_MINUS, LEX_QUOTE, LEX_TIMES, 		// - " *
     LEX_SLASH, LEX_LSS, LEX_GTR,			// / < >
     LEX_LEQ, LEX_GEQ, LEX_EQ,				// <= >= ==
-    LEX_NEQ, LEX_LPAREN, RPAREN,			// != (  )
+    LEX_NEQ, LEX_LPAREN, LEX_RPAREN,		// != (  )
     LEX_COLON, LEX_PERCENT,					// : %
     LEX_NUM,
     LEX_ID,
@@ -36,7 +36,7 @@ string str_lex [100] = {
     "LEX_MINUS", "LEX_QUOTE", "LEX_TIMES", 		// - " *
     "LEX_SLASH", "LEX_LSS", "LEX_GTR",			// / < >
     "LEX_LEQ", "LEX_GEQ", "LEX_EQ",				// <= >= ==
-    "LEX_NEQ", "LEX_LPAREN", "RPAREN",			// != (  )
+    "LEX_NEQ", "LEX_LPAREN", "LEX_RPAREN",		// != (  )
     "LEX_COLON", "LEX_PERCENT",					// : %
     "LEX_NUM",
     "LEX_ID",
@@ -392,6 +392,7 @@ class Parser{
 	void Operator();
 	void SostavnoyOperator();
 	void OperatorViragenie();
+	void Viragenie();
 
 	void gl(){
 		curr_lex = scan.get_lex();
@@ -470,18 +471,80 @@ void Parser::Konstanta(){
 	else
 		throw curr_lex;
 }
+
 void Parser::Celochislennaya(){
 	if (c_type == LEX_NUM)
 		gl();
 	else 
 		throw curr_lex;
 }
+
 // void Parser::Znak(){}
 void Parser::Strokovaya(){}
-void Parser::Operatori(){}
-void Parser::Operator(){}
+void Parser::Operatori(){
+	while (c_type == LEX_IF || 
+		c_type == LEX_WHILE || 
+		c_type == LEX_READ || 
+		c_type == LEX_WRITE || 
+		c_type == LEX_LBRACE 
+		// || ОПЕРАТОР_ВЫРАЖЕНИЕ
+		){
+			Operator();
+	}
+}
+
+void Parser::Operator(){
+	if (c_type == LEX_IF){
+		gl();
+		if (c_type == LEX_LPAREN)
+			gl();
+		else
+			throw curr_lex;
+		Viragenie();
+		if (c_type == LEX_RPAREN)
+			gl();
+		else
+			throw curr_lex;
+		Operator();
+		if (c_type == LEX_ELSE)
+			gl();
+		else
+			throw curr_lex;
+		Operator();
+	}
+	else if (c_type == LEX_WHILE){
+
+	}
+	else if (c_type == LEX_READ){
+
+	}
+	else if (c_type == LEX_WRITE){
+
+	}
+	else if (c_type == LEX_LBRACE){
+		gl();
+		Operatori();
+		if (c_type == LEX_RBRACE)
+			gl();
+		else
+			throw curr_lex;
+	}
+	else if (c_type == LEX_ID){
+		gl();
+		if (c_type == LEX_ASSIGN){
+			gl();
+			// E();
+		}
+		else
+			throw curr_lex;
+	}
+	else
+		OperatorViragenie();
+}
+
 void Parser::SostavnoyOperator(){}
 void Parser::OperatorViragenie(){}
+void Parser::Viragenie(){}
 
 int main() {
     // Lex l;
