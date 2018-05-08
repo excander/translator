@@ -191,7 +191,7 @@ type_of_lex
         LEX_MINUS, LEX_QUOTE, LEX_TIMES, 		// - " *
         LEX_SLASH, LEX_LSS, LEX_GTR,			// / < >
         LEX_LEQ, LEX_GEQ, LEX_EQ,				// <= >= ==
-        LEX_NEQ, LEX_LPAREN, RPAREN,			// != (  )
+        LEX_NEQ, LEX_LPAREN, LEX_RPAREN,			// != (  )
         LEX_COLON, LEX_PERCENT					// : %
 };
 
