@@ -1,7 +1,7 @@
 program {
 int ke;
-string s = "abc", s2;
-int j, k, t=-3, p, sdf=10;
+string s = "abc", s2="123";
+int j, k, t=-3, p, sdf=1;
 
 if (3>2) 
 	j=1;

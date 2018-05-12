@@ -416,7 +416,7 @@ class Parser{
 	// void Opisanie();
 	// void Tip();
 	void Peremennaya(type_of_lex);
-	void Konstanta();
+	void Konstanta(type_of_lex param_type);
 	void Celochislennaya();
 	// void Znak();
 	void Strokovaya();
@@ -499,21 +499,30 @@ void Parser::Peremennaya(type_of_lex param_type){
 		throw curr_lex;
 	if (c_type == LEX_ASSIGN){
 		gl();
-		Konstanta();
+		Konstanta(param_type);
 	}
 }
-void Parser::Konstanta(){
+void Parser::Konstanta(type_of_lex param_type){
 	if (c_type == LEX_PLUS || c_type == LEX_MINUS){
 		gl();
-		Celochislennaya();
+        if (param_type == LEX_INT)
+		  Celochislennaya();
+        else
+            throw string("Error: Incorrect initialization of variable with type ") + string(str_lex[param_type]);
 	}
 	else if (c_type == LEX_NUM){
-		Celochislennaya();
+		if (param_type == LEX_INT)
+          Celochislennaya();
+        else
+            throw string("Error: Incorrect initialization of variable with type ") + string(str_lex[param_type]);
 	}
-	else if (c_type == LEX_QUOTE){
-	}
+	// else if (c_type == LEX_QUOTE){
+	// }
 	else if (c_type == LEX_PHRASE){
-		Strokovaya();
+		if (param_type == LEX_STRING)
+          Strokovaya();
+        else
+            throw string("Error: Incorrect initialization of variable with type ") + string(str_lex[param_type]);
 	}
 	else
 		throw curr_lex;
@@ -738,12 +747,12 @@ int main() {
         cout << s << endl;
     }
 
-
-Ident cid;
-int i=1;
- while (TID[i].get_name()){
-    cout << TID[i].get_name() << "  " << str_lex[TID[i].get_type()]<< " -> " << TID[i].get_declare() << endl;
-    i++;
-}
+// // Вывод всех идентификаторов из таблицы TID, с типом и флагом описания
+// Ident cid;
+// int i=1;
+//  while (TID[i].get_name()){
+//     cout << TID[i].get_name() << "  " << str_lex[TID[i].get_type()]<< " -> " << TID[i].get_declare() << endl;
+//     i++;
+// }
 
 }
