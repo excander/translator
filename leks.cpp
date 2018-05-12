@@ -21,7 +21,7 @@ enum type_of_lex {
     LEX_NUM,
     LEX_ID,
     LEX_EOF,
-    LEX_LITERA
+    LEX_PHRASE
 };
 
 string str_lex [100] = {
@@ -42,7 +42,7 @@ string str_lex [100] = {
     "LEX_NUM",
     "LEX_ID",
     "LEX_EOF",
-    "LEX_LITERA"
+    "LEX_PHRASE"
 };	
 
 /////////////////////////  Класс Lex  //////////////////////////
@@ -123,36 +123,36 @@ int Tabl_ident::put(char *buf){
     return top-1;
 }
 
-//////////////////////  Класс Tabl_liter  ///////////////////////
+//////////////////////  Класс Tabl_phrase  ///////////////////////
 
-class Tabl_liter{
-    string *p;
-    int size;
-    int top;
+// class Tabl_phrase{
+//     string *p;
+//     int size;
+//     int top;
 
-public:
-    Tabl_liter(int maxsize){
-        p = new string[maxsize];
-        top = 1;
-    }
-    ~Tabl_liter () { delete []p; }
-    string& operator[] (int k) { return p[k]; }
-    int put (char *);
-};
+// public:
+//     Tabl_phrase(int maxsize){
+//         p = new string[maxsize];
+//         top = 1;
+//     }
+//     ~Tabl_phrase () { delete []p; }
+//     string& operator[] (int k) { return p[k]; }
+//     int put (char *);
+// };
 
-int Tabl_liter::put(char *buf){
-    // for(int j=1; j<top; j++)
-    //     if ( !strcmp(p[j].get_name(), buf) )
-    //         return j;
-    p[top] = string(buf);
-    top++;
-    return top-1;
-}
+// int Tabl_phrase::put(char *buf){
+//     // for(int j=1; j<top; j++)
+//     //     if ( !strcmp(p[j].get_name(), buf) )
+//     //         return j;
+//     p[top] = string(buf);
+//     top++;
+//     return top-1;
+// }
 
 ////////////////////////////////////////////////////////////////////
 
 Tabl_ident TID(100);
-Tabl_liter TLIT(100);
+// Tabl_phrase TPHR(100);
 
 /////////////////////  Класс Scanner  //////////////////////////////
 
@@ -311,8 +311,8 @@ Scanner::get_lex() {
             	}
             	else if  (c == '"'){
             		gc();
-            		j = TLIT.put(buf);
-            		return Lex(LEX_LITERA, j);
+            		// j = TPHR.put(buf);
+            		return Lex(LEX_PHRASE);
             	}
             	else {
             		gc();
@@ -443,7 +443,7 @@ public:
 void Parser::analyze(){
 	gl();
 	Programma();
-	cout << endl << "Yes!!!" << endl;
+	cout << endl << "Success!!!" << endl;
 }
 
 void Parser::Programma(){
@@ -502,7 +502,7 @@ void Parser::Konstanta(){
 	}
 	else if (c_type == LEX_QUOTE){
 	}
-	else if (c_type == LEX_LITERA){
+	else if (c_type == LEX_PHRASE){
 		Strokovaya();
 	}
 	else
@@ -518,7 +518,7 @@ void Parser::Celochislennaya(){
 
 // void Parser::Znak(){}
 void Parser::Strokovaya(){
-	if (c_type == LEX_LITERA)
+	if (c_type == LEX_PHRASE)
 		gl();
 	else 
 		throw curr_lex;
