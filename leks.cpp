@@ -112,6 +112,7 @@ public:
     ~Tabl_ident () { delete []p; }
     Ident& operator[] (int k) { return p[k]; }
     int put (char *name);
+    int get_size(){return size;}
 };
 
 int Tabl_ident::put(char *buf){
@@ -414,7 +415,7 @@ class Parser{
 	void Opisaniya();
 	// void Opisanie();
 	// void Tip();
-	void Peremennaya();
+	void Peremennaya(type_of_lex);
 	void Konstanta();
 	void Celochislennaya();
 	// void Znak();
@@ -467,11 +468,12 @@ void Parser::Programma(){
 
 void Parser::Opisaniya(){
 	while (c_type == LEX_INT || c_type == LEX_STRING){
+        type_of_lex temp_type = c_type;
 		gl();
-		Peremennaya();
+		Peremennaya(temp_type);
 		while (c_type == LEX_COMMA){
 			gl();
-			Peremennaya();
+			Peremennaya(temp_type);
 		}
 		if (c_type == LEX_SEMICOLON)
 			gl();
@@ -482,9 +484,17 @@ void Parser::Opisaniya(){
 
 // void Parser::Opisanie(){}
 // void Parser::Tip(){}
-void Parser::Peremennaya(){
-	if (c_type == LEX_ID)
-		gl();
+void Parser::Peremennaya(type_of_lex param_type){
+	if (c_type == LEX_ID){
+		int i=curr_lex.get_value();
+        if (TID[i].get_declare())
+            throw string("Error: Variable ")+ string(TID[i].get_name()) + string(" declared twice!");
+        else { 
+            TID[i].put_declare();
+            TID[i].put_type(param_type);
+            gl();
+        }
+    }
 	else
 		throw curr_lex;
 	if (c_type == LEX_ASSIGN){
@@ -693,8 +703,8 @@ int main() {
     // Lex l;
     // Ident id1;
     // id1.put_strval("asd");
-    // cout << id1.get_strval() << endl;
-
+    // cout << id1.get_strval() << endl; 
+ 
 
 	// Scanner scan1("input.txt");
  //    try {
@@ -724,5 +734,16 @@ int main() {
     cout << l << " <=> " << str_lex[l.get_type()] << endl;
     return 1;
   }
+    catch (string s){
+        cout << s << endl;
+    }
+
+
+Ident cid;
+int i=1;
+ while (TID[i].get_name()){
+    cout << TID[i].get_name() << "  " << str_lex[TID[i].get_type()]<< " -> " << TID[i].get_declare() << endl;
+    i++;
+}
 
 }
