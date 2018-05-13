@@ -8,7 +8,7 @@ if (3>2*3)
 else
 	j=3;
 
-while(s+"ag"){
+while(t){
 	i= i+1;
 	j= j+5;
 	s= s+"a";

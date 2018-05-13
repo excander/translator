@@ -189,6 +189,43 @@ T Stack < T, max_size > :: pop ()
     throw "stack_is_empty";
 }
 
+/////////////////////  Класс Poliz    //////////////////////////////
+
+class Poliz {
+    Lex* p;
+    int size;
+    int free;
+public:
+    Poliz(int max_size) {
+        p = new Lex[size = max_size];
+        free = 0;
+    }
+    ~Poliz() {delete []p;}
+    void put_lex(Lex l){
+        p[free] = l;
+        free++;
+    }
+    void put_lex(Lex l, int place){
+        if (0 > place && place <= size)
+            p[place] = l;
+    }
+    Lex& operator[](int k){
+        if ( k > size )
+            throw "POLIZ:out of array";
+        else if ( k > free )
+            throw "POLIZ:indefinite element of array";
+        else
+            return p[k];
+    }
+    void blank(){ free++; }
+    int get_free(){ return free; }
+    void print(){
+        for (int i=0; i<free; i++){
+            cout << p[i];
+        }
+    }
+};
+
 /////////////////////  Класс Scanner  //////////////////////////////
 
 class Scanner {
@@ -479,7 +516,8 @@ class Parser{
 	};
 
 public:
-	Parser(const char *program): scan(program){}
+    Poliz prog;
+	Parser(const char *program): scan(program), prog(1000){}
 	void analyze();
 };
 
