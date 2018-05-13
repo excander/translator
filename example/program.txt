@@ -1,6 +1,8 @@
 program 
-var i:int; 
+var i:int,
+b:bool; 
 begin
+b:=true;
 i:=5;
-write(5)
+if(b==true) then write(5) else write(6)
 end@

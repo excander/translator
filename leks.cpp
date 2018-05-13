@@ -155,6 +155,40 @@ int Tabl_ident::put(char *buf){
 Tabl_ident TID(100);
 // Tabl_phrase TPHR(100);
 
+///////////////////////////////////////////////////////////////////
+
+template < class T, int max_size >
+class Stack
+{
+         T            s [max_size];
+         int          top;
+public:
+                      Stack () { top = 0; }
+         void         reset () { top = 0; }
+         void         push ( T i );
+         T            pop ();
+         bool         is_empty () { return top == 0; }
+         bool         is_full  () { return top == max_size; }
+};
+ 
+template < class T, int max_size >
+void Stack < T, max_size > :: push (T i)
+{
+  if ( !is_full() )
+    s [top++] = i;
+  else
+    throw "Stack_is_full";
+}
+ 
+template <class T, int max_size >
+T Stack < T, max_size > :: pop ()
+{
+  if ( !is_empty() )
+    return s[--top];
+  else
+    throw "stack_is_empty";
+}
+
 /////////////////////  Класс Scanner  //////////////////////////////
 
 class Scanner {
@@ -408,6 +442,7 @@ class Parser{
 	Lex curr_lex;
 	type_of_lex c_type;
 	int c_val;
+    Stack < type_of_lex, 100 >  st_lex;
 	string str_val; /////////////////// ??
 	Scanner scan;
 
@@ -430,6 +465,11 @@ class Parser{
 	void T();
 	void F();
 
+    void check_id ();
+    void check_op ();
+    void check_not ();
+    void eq_type ();
+
 	void gl(){
 		curr_lex = scan.get_lex();
 		c_type = curr_lex.get_type();
@@ -440,6 +480,8 @@ public:
 	Parser(const char *program): scan(program){}
 	void analyze();
 };
+
+
 
 void Parser::analyze(){
 	gl();
@@ -658,8 +700,10 @@ void Parser::Viragenie(){
 	E1();
 	if (c_type == LEX_EQ || c_type == LEX_LSS || c_type == LEX_GTR ||
 		c_type == LEX_LEQ || c_type == LEX_GEQ || c_type == LEX_NEQ ){
+            st_lex.push(c_type); // проверка типов в выражении
 			gl();
 			E1();
+            check_op(); // проверка типов в выражении
 	}
 }
 
@@ -667,8 +711,10 @@ void Parser::E1 ()
 {
   T();
   while ( c_type == LEX_PLUS || c_type == LEX_MINUS || c_type == LEX_OR){
+    st_lex.push(c_type); // проверка типов в выражении
     gl();
     T();
+    check_op(); // проверка типов в выражении
   }
 }
  
@@ -676,22 +722,31 @@ void Parser::T ()
 {
   F();
   while ( c_type == LEX_TIMES || c_type == LEX_SLASH || c_type == LEX_AND) {
-   gl();
-   F();
+    st_lex.push(c_type); // проверка типов в выражении
+    gl();
+    F();
+    check_op(); // проверка типов в выражении
   }
 }
  
 void Parser::F () 
 {
   if ( c_type == LEX_ID ){
+    check_id(); // проверка типов в выражении
     gl();
   }
   else if ( c_type == LEX_NUM ){
+    st_lex.push(LEX_INT); // проверка типов в выражении
     gl();
   }
   else if (c_type == LEX_NOT){
     gl(); 
     F(); 
+    check_not(); // проверка типов в выражении
+  }
+  else if (c_type == LEX_PHRASE){
+    st_lex.push(LEX_STRING); // проверка типов в выражении
+    gl();
   }
   else if ( c_type == LEX_LPAREN ) 
   {
@@ -704,6 +759,49 @@ void Parser::F ()
   }
   else 
     throw curr_lex;
+}
+
+////////////////проверка типов в выражении////////////////////////
+
+void Parser::check_id () 
+{
+  if ( TID[c_val].get_declare() )
+    st_lex.push ( TID[c_val].get_type() );
+  else 
+    throw  string("Error: Variable ") + string(TID[c_val].get_name()) + string(" is not declared!");
+}
+
+void Parser::check_op () 
+{
+  type_of_lex t1, t2, op;
+ 
+  t2 = st_lex.pop();
+  op = st_lex.pop();
+  t1 = st_lex.pop();
+  if (t1 == t2){
+    if (op == LEX_PLUS && t1 == LEX_STRING)
+        st_lex.push(LEX_STRING);
+    else if (t1 == LEX_STRING && (op == LEX_MINUS || op == LEX_TIMES|| op == LEX_SLASH || op == LEX_PERCENT ||
+             op == LEX_LEQ || op == LEX_GEQ || op == LEX_AND || op == LEX_OR))
+        throw "Error: Incorrect operation for string type!";
+    else
+        st_lex.push(LEX_INT);
+    // st_lex.push(r);
+  }
+  else
+    throw "Error: Unequal types in expression!";
+  // prog.put_lex (Lex (op) );
+}
+
+void Parser::check_not () 
+{
+  if (st_lex.pop() != LEX_INT)
+    throw "wrong type is in not";
+  else 
+  {
+    st_lex.push (LEX_INT);
+    // prog.put_lex (Lex (LEX_NOT));
+  }
 }
 
 
