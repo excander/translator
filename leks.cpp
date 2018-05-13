@@ -469,6 +469,8 @@ class Parser{
     void check_op ();
     void check_not ();
     void eq_type ();
+    void eq_int();
+    void check_id_in_read();
 
 	void gl(){
 		curr_lex = scan.get_lex();
@@ -603,6 +605,7 @@ void Parser::Operator(){
 		else
 			throw curr_lex;
 		Viragenie();
+        eq_int(); // проверка типов в операторах
 		if (c_type == LEX_RPAREN)
 			gl();
 		else
@@ -621,6 +624,7 @@ void Parser::Operator(){
 		else
 			throw curr_lex;
 		Viragenie();
+        eq_int(); // проверка типов в операторах
 		if (c_type == LEX_RPAREN)
 			gl();
 		else
@@ -633,8 +637,10 @@ void Parser::Operator(){
 			gl();
 		else
 			throw curr_lex;
-		if (c_type == LEX_ID)
+		if (c_type == LEX_ID){
+            check_id_in_read(); // проверка типов в операторах
 			gl();
+        }
 		else
 			throw curr_lex;
 		if (c_type == LEX_RPAREN)
@@ -675,10 +681,12 @@ void Parser::Operator(){
 			throw curr_lex;
 	}
 	else if (c_type == LEX_ID){
+        check_id (); // проверка типов в операторах
 		gl();
 		if (c_type == LEX_ASSIGN){
 			gl();
 			OperatorViragenie();
+            eq_type(); // проверка типов в операторах
 		}
 		else
 			throw curr_lex;
@@ -804,7 +812,22 @@ void Parser::check_not ()
   }
 }
 
+////////////////проверка типов в операторах////////////////////////
 
+void Parser::eq_type (){
+    if (st_lex.pop() != st_lex.pop())
+        throw "Error: Wrong types in assign operator!";
+} 
+
+void Parser::eq_int (){
+    if (st_lex.pop() != LEX_INT)
+        throw "Error: Type of conditional expression must be integer!";
+}
+
+void Parser::check_id_in_read (){
+    if (!TID[c_val].get_declare())
+        string("Error: Variable ") + string(TID[c_val].get_name()) + string(" is not declared in read operator!");
+}
 
 int main() {
     // Lex l;

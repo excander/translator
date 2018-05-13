@@ -3,18 +3,19 @@ int ke;
 string s = "abc", s2="123";
 int j, k, t=-3, p, sdf=1, i;
 
-if (3>2) 
+if (3>2*3) 
 	j=1;
 else
 	j=3;
 
-while(not(s<"wret")){
+while(s+"ag"){
 	i= i+1;
 	j= j+5;
 	s= s+"a";
 
 }
+s="asdfew";
 
-read(k);
+read(kkkk);
 write(1+1, k);
 }
