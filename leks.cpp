@@ -633,8 +633,10 @@ void Parser::Celochislennaya(){
 
 // void Parser::Znak(){}
 void Parser::Strokovaya(){
-	if (c_type == LEX_PHRASE)
+	if (c_type == LEX_PHRASE){
+        TID[ind].put_value(curr_lex.get_value());
 		gl();
+    }
 	else 
 		throw curr_lex;
 }
@@ -1110,19 +1112,17 @@ int main() {
     }
 
 // Вывод всех идентификаторов из таблицы TID, с типом и флагом описания
-Ident cid;
 int i=1;
  while (TID[i].get_name()){
     cout << TID[i].get_name() << "  " << str_lex[TID[i].get_type()]<< " -> "<< TID[i].get_declare()<< "  " << TID[i].get_value() << endl;
     i++;
 }
 
-// // Вывод всех фраз из таблицы TPHR
-// Ident cid;
-// int i=1;
-//  while (i < TPHR.get_top()){
-//     cout << i<<"-\""<< TPHR[i] << "\""<< endl;
-//     i++;
-// }
+// Вывод всех фраз из таблицы TPHR
+int j=1;
+ while (j < TPHR.get_top()){
+    cout << j<<"-\""<< TPHR[j] << "\""<< endl;
+    j++;
+}
 
 }
