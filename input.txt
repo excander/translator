@@ -1,5 +1,5 @@
 program {
 int k=-3,e,r=+123,sd,asg;
 string s1="aaa", s2, s3="bbb";
-write(4);
+if ((2+2)<1) write(1+1); else write(1-1);
 }

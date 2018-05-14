@@ -625,6 +625,7 @@ void Parser::Konstanta(Lex param_lex){
 void Parser::Celochislennaya(){
 	if (c_type == LEX_NUM){
         TID[ind].put_value(sign*curr_lex.get_value());
+        TID[ind].put_assign();
         gl();
     }
 	else 
@@ -635,6 +636,7 @@ void Parser::Celochislennaya(){
 void Parser::Strokovaya(){
 	if (c_type == LEX_PHRASE){
         TID[ind].put_value(curr_lex.get_value());
+        TID[ind].put_assign();
 		gl();
     }
 	else 
@@ -1062,7 +1064,7 @@ void Interpretator::interpretation ()
   cout << endl;
   pars.prog.print();
   cout << endl;
-  // E.execute ( pars.prog );
+  E.execute ( pars.prog );
 }
 
 int main() {
@@ -1082,17 +1084,17 @@ int main() {
 	// }
 
 // Проверка работы лексич+семантич анализа и генерации полиза
-	Parser pars1("input.txt");
-	try {
-		pars1.analyze();
-        pars1.prog.print();
-	}
-  // try
-  // {
-  //   Interpretator I ("input.txt");
-  //   I.interpretation ();
-  //   return 0;
-  // }
+	// Parser pars1("input.txt");
+	// try {
+	// 	pars1.analyze();
+ //        pars1.prog.print();
+	// }
+  try
+  {
+    Interpretator I ("input.txt");
+    I.interpretation ();
+    return 0;
+  }
 
   catch (char c){
     cout << "unexpected symbol " << c << endl;
@@ -1111,18 +1113,18 @@ int main() {
         cout << s << endl;
     }
 
-// Вывод всех идентификаторов из таблицы TID, с типом и флагом описания
-int i=1;
- while (TID[i].get_name()){
-    cout << TID[i].get_name() << "  " << str_lex[TID[i].get_type()]<< " -> "<< TID[i].get_declare()<< "  " << TID[i].get_value() << endl;
-    i++;
-}
+// // Вывод всех идентификаторов из таблицы TID, с типом и флагом описания
+// int i=1;
+//  while (TID[i].get_name()){
+//     cout << TID[i].get_name() << "  " << str_lex[TID[i].get_type()]<< " -> "<< TID[i].get_declare()<< "  " << TID[i].get_value() << endl;
+//     i++;
+// }
 
-// Вывод всех фраз из таблицы TPHR
-int j=1;
- while (j < TPHR.get_top()){
-    cout << j<<"-\""<< TPHR[j] << "\""<< endl;
-    j++;
-}
+// // Вывод всех фраз из таблицы TPHR
+// int j=1;
+//  while (j < TPHR.get_top()){
+//     cout << j<<"-\""<< TPHR[j] << "\""<< endl;
+//     j++;
+// }
 
 }
