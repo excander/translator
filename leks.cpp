@@ -21,7 +21,11 @@ enum type_of_lex {
     LEX_NUM,
     LEX_ID,
     LEX_EOF,
-    LEX_PHRASE
+    LEX_PHRASE,
+    POLIZ_LABEL, 
+    POLIZ_ADDRESS,
+    POLIZ_GO,
+    POLIZ_FGO
 };
 
 string str_lex [100] = {
@@ -42,7 +46,11 @@ string str_lex [100] = {
     "LEX_NUM",
     "LEX_ID",
     "LEX_EOF",
-    "LEX_PHRASE"
+    "LEX_PHRASE",
+    "POLIZ_LABEL", 
+    "POLIZ_ADDRESS",
+    "POLIZ_GO",
+    "POLIZ_FGO"
 };	
 
 /////////////////////////  Класс Lex  //////////////////////////
@@ -72,7 +80,7 @@ class Ident {
     type_of_lex type;
     bool assign;
     int intval;
-    string strval;
+    // string strval;
 
 public:
     Ident() {
@@ -93,8 +101,8 @@ public:
     void put_assign() { assign = true; }
     int get_intval() { return intval; }
     void put_intval(int v) { intval = v; }
-    string get_strval() { return strval; } 		//???????????
-    void put_strval(string s) { strval = s; } 	//???????????
+    // string get_strval() { return strval; } 		//???????????
+    // void put_strval(string s) { strval = s; } 	//???????????
 };
 
 //////////////////////  Класс Tabl_ident  ///////////////////////
@@ -126,34 +134,35 @@ int Tabl_ident::put(char *buf){
 
 //////////////////////  Класс Tabl_phrase  ///////////////////////
 
-// class Tabl_phrase{
-//     string *p;
-//     int size;
-//     int top;
+class Tabl_phrase{
+    string *p;
+    // int size;
+    int top;
 
-// public:
-//     Tabl_phrase(int maxsize){
-//         p = new string[maxsize];
-//         top = 1;
-//     }
-//     ~Tabl_phrase () { delete []p; }
-//     string& operator[] (int k) { return p[k]; }
-//     int put (char *);
-// };
+public:
+    Tabl_phrase(int maxsize){
+        p = new string[maxsize];
+        top = 1;
+    }
+    ~Tabl_phrase () { delete []p; }
+    string& operator[] (int k) { return p[k]; }
+    int put (char *);
+    int get_top(){return top;}
+};
 
-// int Tabl_phrase::put(char *buf){
-//     // for(int j=1; j<top; j++)
-//     //     if ( !strcmp(p[j].get_name(), buf) )
-//     //         return j;
-//     p[top] = string(buf);
-//     top++;
-//     return top-1;
-// }
+int Tabl_phrase::put(char *buf){
+    // for(int j=1; j<top; j++)
+    //     if ( !strcmp(p[j].get_name(), buf) )
+    //         return j;
+    p[top] = string(buf);
+    top++;
+    return top-1;
+}
 
 ////////////////////////////////////////////////////////////////////
 
 Tabl_ident TID(100);
-// Tabl_phrase TPHR(100);
+Tabl_phrase TPHR(100);
 
 ///////////////////////////////////////////////////////////////////
 
@@ -206,7 +215,7 @@ public:
         free++;
     }
     void put_lex(Lex l, int place){
-        if (0 > place && place <= size)
+        if (0 < place && place <= size)
             p[place] = l;
     }
     Lex& operator[](int k){
@@ -221,7 +230,8 @@ public:
     int get_free(){ return free; }
     void print(){
         for (int i=0; i<free; i++){
-            cout << p[i];
+            // cout << p[i];
+            cout << str_lex[p[i].get_type()] << endl;
         }
     }
 };
@@ -383,8 +393,8 @@ Scanner::get_lex() {
             	}
             	else if  (c == '"'){
             		gc();
-            		// j = TPHR.put(buf);
-            		return Lex(LEX_PHRASE);
+            		j = TPHR.put(buf);
+            		return Lex(LEX_PHRASE, j);
             	}
             	else {
             		gc();
@@ -480,7 +490,7 @@ class Parser{
 	type_of_lex c_type;
 	int c_val;
     Stack < type_of_lex, 100 >  st_lex;
-	string str_val; /////////////////// ??
+	// string str_val; /////////////////// ??
 	Scanner scan;
 
 	void Programma();
@@ -636,6 +646,8 @@ void Parser::Operatori(){
 }
 
 void Parser::Operator(){
+    int pl0, pl1, pl2, pl3;
+
 	if (c_type == LEX_IF){
 		gl();
 		if (c_type == LEX_LPAREN)
@@ -644,18 +656,27 @@ void Parser::Operator(){
 			throw curr_lex;
 		Viragenie();
         eq_int(); // проверка типов в операторах
+        pl2 = prog.get_free(); // внутр предст
+        prog.blank(); // внутр предст
+        prog.put_lex(Lex(POLIZ_FGO)); // внутр предст
 		if (c_type == LEX_RPAREN)
 			gl();
 		else
 			throw curr_lex;
 		Operator();
-		if (c_type == LEX_ELSE)
+        pl3 = prog.get_free(); prog.blank(); // внутр предст
+        prog.put_lex(Lex(POLIZ_GO)); // внутр предст
+        prog.put_lex(Lex(POLIZ_LABEL, prog.get_free()),pl2); // внутр предст
+		if (c_type == LEX_ELSE){
 			gl();
-		else
+            Operator();
+            prog.put_lex(Lex(POLIZ_LABEL, prog.get_free()),pl3); // внутр предст
+		}
+        else
 			throw curr_lex;
-		Operator();
 	}
 	else if (c_type == LEX_WHILE){
+        pl0=prog.get_free(); // внутр предст
 		gl();
 		if (c_type == LEX_LPAREN)
 			gl();
@@ -663,11 +684,18 @@ void Parser::Operator(){
 			throw curr_lex;
 		Viragenie();
         eq_int(); // проверка типов в операторах
-		if (c_type == LEX_RPAREN)
+        pl1=prog.get_free(); prog.blank(); // внутр предст
+        prog.put_lex(Lex(POLIZ_FGO)); // внутр предст
+		if (c_type == LEX_RPAREN){
 			gl();
+            Operator();
+            prog.put_lex(Lex(POLIZ_LABEL, pl0)); // внутр предст
+            prog.put_lex(Lex(POLIZ_GO)); // внутр предст
+            prog.put_lex(Lex(POLIZ_LABEL, prog.get_free()), pl1); // внутр предст
+        }
 		else
 			throw curr_lex;
-		Operator();
+
 	}
 	else if (c_type == LEX_READ){
 		gl();
@@ -677,12 +705,15 @@ void Parser::Operator(){
 			throw curr_lex;
 		if (c_type == LEX_ID){
             check_id_in_read(); // проверка типов в операторах
+            prog.put_lex(Lex(POLIZ_ADDRESS, c_val)); // внутр предст
 			gl();
         }
 		else
 			throw curr_lex;
-		if (c_type == LEX_RPAREN)
+		if (c_type == LEX_RPAREN){
 			gl();
+            prog.put_lex(Lex(LEX_READ)); // внутр предст
+        }
 		else
 			throw curr_lex;
 		if (c_type == LEX_SEMICOLON)
@@ -701,8 +732,10 @@ void Parser::Operator(){
 			gl();
 			Viragenie();
 		}
-		if (c_type == LEX_RPAREN)
+		if (c_type == LEX_RPAREN){
 			gl();
+            prog.put_lex(Lex(LEX_WRITE)); // внутр предст
+        }
 		else
 			throw curr_lex;
 		if (c_type == LEX_SEMICOLON)
@@ -720,11 +753,13 @@ void Parser::Operator(){
 	}
 	else if (c_type == LEX_ID){
         check_id (); // проверка типов в операторах
+        prog.put_lex(Lex(POLIZ_ADDRESS, c_val)); // внутр предст
 		gl();
 		if (c_type == LEX_ASSIGN){
 			gl();
 			OperatorViragenie();
             eq_type(); // проверка типов в операторах
+            prog.put_lex(Lex(LEX_ASSIGN)); // внутр предст
 		}
 		else
 			throw curr_lex;
@@ -779,10 +814,12 @@ void Parser::F ()
 {
   if ( c_type == LEX_ID ){
     check_id(); // проверка типов в выражении
+    prog.put_lex(curr_lex); // внутр предст
     gl();
   }
   else if ( c_type == LEX_NUM ){
     st_lex.push(LEX_INT); // проверка типов в выражении
+    prog.put_lex(curr_lex); // внутр предст
     gl();
   }
   else if (c_type == LEX_NOT){
@@ -792,6 +829,7 @@ void Parser::F ()
   }
   else if (c_type == LEX_PHRASE){
     st_lex.push(LEX_STRING); // проверка типов в выражении
+    prog.put_lex(curr_lex); // внутр предст
     gl();
   }
   else if ( c_type == LEX_LPAREN ) 
@@ -836,7 +874,7 @@ void Parser::check_op ()
   }
   else
     throw "Error: Unequal types in expression!";
-  // prog.put_lex (Lex (op) );
+  prog.put_lex(Lex(op)); // внутр предст
 }
 
 void Parser::check_not () 
@@ -846,7 +884,7 @@ void Parser::check_not ()
   else 
   {
     st_lex.push (LEX_INT);
-    // prog.put_lex (Lex (LEX_NOT));
+    prog.put_lex(Lex(LEX_NOT)); // внутр предст
   }
 }
 
@@ -892,6 +930,7 @@ int main() {
 	Parser pars1("input.txt");
 	try {
 		pars1.analyze();
+        pars1.prog.print();
 	}
 	catch (char const* str){
     	cout << str << endl;
@@ -911,6 +950,14 @@ int main() {
 // int i=1;
 //  while (TID[i].get_name()){
 //     cout << TID[i].get_name() << "  " << str_lex[TID[i].get_type()]<< " -> " << TID[i].get_declare() << endl;
+//     i++;
+// }
+
+// // Вывод всех фраз из таблицы TPHR
+// Ident cid;
+// int i=1;
+//  while (i < TPHR.get_top()){
+//     cout << i<<"-\""<< TPHR[i] << "\""<< endl;
 //     i++;
 // }
 
