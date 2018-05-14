@@ -910,7 +910,7 @@ void Parser::eq_int (){
 
 void Parser::check_id_in_read (){
     if (!TID[c_val].get_declare())
-        string("Error: Variable ") + string(TID[c_val].get_name()) + string(" is not declared in read operator!");
+       throw string("Error: Variable ") + string(TID[c_val].get_name()) + string(" is not declared in read operator!");
 }
 
 ////////////////////////////////////////////////////////////////
