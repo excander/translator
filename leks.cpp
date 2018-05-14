@@ -486,7 +486,7 @@ Scanner::get_lex() {
 }
 
 class Parser{
-    int i1, sign = 1;
+    int ind, sign = 1;
 	Lex curr_lex;
 	type_of_lex c_type;
 	int c_val;
@@ -499,10 +499,10 @@ class Parser{
 	// void Opisanie();
 	// void Tip();
 	void Peremennaya(Lex);
-	void Konstanta(Lex, int);
-	void Celochislennaya(int ind);
+	void Konstanta(Lex);
+	void Celochislennaya();
 	// void Znak();
-	void Strokovaya(int ind);
+	void Strokovaya();
 	void Operatori();
 	void Operator();
 	void SostavnoyOperator();
@@ -579,12 +579,12 @@ void Parser::Opisaniya(){
 // void Parser::Tip(){}
 void Parser::Peremennaya(Lex param_lex){
 	if (c_type == LEX_ID){
-		i1=curr_lex.get_value();
-        if (TID[i1].get_declare())
-            throw string("Error: Variable ")+ string(TID[i1].get_name()) + string(" declared twice!");
+		ind=curr_lex.get_value();
+        if (TID[ind].get_declare())
+            throw string("Error: Variable ")+ string(TID[ind].get_name()) + string(" declared twice!");
         else { 
-            TID[i1].put_declare();
-            TID[i1].put_type(param_lex.get_type());
+            TID[ind].put_declare();
+            TID[ind].put_type(param_lex.get_type());
             gl();
         }
     }
@@ -592,21 +592,21 @@ void Parser::Peremennaya(Lex param_lex){
 		throw curr_lex;
 	if (c_type == LEX_ASSIGN){
 		gl();
-		Konstanta(param_lex, i1);
+		Konstanta(param_lex);
 	}
 }
-void Parser::Konstanta(Lex param_lex, int ind){
+void Parser::Konstanta(Lex param_lex){
 	if (c_type == LEX_PLUS || c_type == LEX_MINUS){
         (c_type == LEX_MINUS)?sign=-1:sign=1;
 		gl();
         if (param_lex.get_type() == LEX_INT)
-		  Celochislennaya(ind);
+		  Celochislennaya();
         else
             throw string("Error: Incorrect initialization of variable with type ") + string(str_lex[param_lex.get_type()]);
 	}
 	else if (c_type == LEX_NUM){
 		if (param_lex.get_type() == LEX_INT)
-          Celochislennaya(ind);
+          Celochislennaya();
         else
             throw string("Error: Incorrect initialization of variable with type ") + string(str_lex[param_lex.get_type()]);
 	}
@@ -614,7 +614,7 @@ void Parser::Konstanta(Lex param_lex, int ind){
 	// }
 	else if (c_type == LEX_PHRASE){
 		if (param_lex.get_type() == LEX_STRING)
-          Strokovaya(ind);
+          Strokovaya();
         else
             throw string("Error: Incorrect initialization of variable with type ") + string(str_lex[param_lex.get_type()]);
 	}
@@ -622,7 +622,7 @@ void Parser::Konstanta(Lex param_lex, int ind){
 		throw curr_lex;
 }
 
-void Parser::Celochislennaya(int ind){
+void Parser::Celochislennaya(){
 	if (c_type == LEX_NUM){
         TID[ind].put_value(sign*curr_lex.get_value());
         gl();
@@ -632,7 +632,7 @@ void Parser::Celochislennaya(int ind){
 }
 
 // void Parser::Znak(){}
-void Parser::Strokovaya(int ind){
+void Parser::Strokovaya(){
 	if (c_type == LEX_PHRASE)
 		gl();
 	else 
@@ -1080,17 +1080,17 @@ int main() {
 	// }
 
 // Проверка работы лексич+семантич анализа и генерации полиза
-	// Parser pars1("input.txt");
-	// try {
-	// 	pars1.analyze();
- //        pars1.prog.print();
-	// }
-  try
-  {
-    Interpretator I ("input.txt");
-    I.interpretation ();
-    return 0;
-  }
+	Parser pars1("input.txt");
+	try {
+		pars1.analyze();
+        pars1.prog.print();
+	}
+  // try
+  // {
+  //   Interpretator I ("input.txt");
+  //   I.interpretation ();
+  //   return 0;
+  // }
 
   catch (char c){
     cout << "unexpected symbol " << c << endl;
@@ -1109,13 +1109,13 @@ int main() {
         cout << s << endl;
     }
 
-// // Вывод всех идентификаторов из таблицы TID, с типом и флагом описания
-// Ident cid;
-// int i=1;
-//  while (TID[i].get_name()){
-//     cout << TID[i].get_name() << "  " << str_lex[TID[i].get_type()]<< " -> "<< TID[i].get_declare()<< "  " << TID[i].get_value() << endl;
-//     i++;
-// }
+// Вывод всех идентификаторов из таблицы TID, с типом и флагом описания
+Ident cid;
+int i=1;
+ while (TID[i].get_name()){
+    cout << TID[i].get_name() << "  " << str_lex[TID[i].get_type()]<< " -> "<< TID[i].get_declare()<< "  " << TID[i].get_value() << endl;
+    i++;
+}
 
 // // Вывод всех фраз из таблицы TPHR
 // Ident cid;
