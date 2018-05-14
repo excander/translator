@@ -3,6 +3,6 @@ var i:int,
 b:bool; 
 begin
 b:=true;
-i:=5;
+i:=5/2;
 if(b) then write(5) else write(6)
 end@

@@ -1,5 +1,11 @@
 program {
 int k=-3,e,r=+123,sd,asg;
 string s1="aaa", s2, s3="bbb";
-if ((2+2)<1) write(1+1); else write(1-1);
+read(k);
+ if (1 and 1) write(1+1); else write(1-1);
+while(k<=0){
+	write(s1);
+	s1=s1+"q";
+	k=k+1;
+} 
 }
