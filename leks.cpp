@@ -79,7 +79,7 @@ class Ident {
     bool declare;
     type_of_lex type;
     bool assign;
-    int intval;
+    int value;
     // string strval;
 
 public:
@@ -99,8 +99,8 @@ public:
     void put_type(type_of_lex t) { type = t; }
     bool get_assign() { return assign; }
     void put_assign() { assign = true; }
-    int get_intval() { return intval; }
-    void put_intval(int v) { intval = v; }
+    int get_value() { return value; }
+    void put_value(int v) { value = v; }
     // string get_strval() { return strval; } 		//???????????
     // void put_strval(string s) { strval = s; } 	//???????????
 };
@@ -486,6 +486,7 @@ Scanner::get_lex() {
 }
 
 class Parser{
+    int i1, sign = 1;
 	Lex curr_lex;
 	type_of_lex c_type;
 	int c_val;
@@ -497,11 +498,11 @@ class Parser{
 	void Opisaniya();
 	// void Opisanie();
 	// void Tip();
-	void Peremennaya(type_of_lex);
-	void Konstanta(type_of_lex param_type);
-	void Celochislennaya();
+	void Peremennaya(Lex);
+	void Konstanta(Lex, int);
+	void Celochislennaya(int ind);
 	// void Znak();
-	void Strokovaya();
+	void Strokovaya(int ind);
 	void Operatori();
 	void Operator();
 	void SostavnoyOperator();
@@ -560,12 +561,12 @@ void Parser::Programma(){
 
 void Parser::Opisaniya(){
 	while (c_type == LEX_INT || c_type == LEX_STRING){
-        type_of_lex temp_type = c_type;
+        Lex param_lex = curr_lex;
 		gl();
-		Peremennaya(temp_type);
+		Peremennaya(param_lex);
 		while (c_type == LEX_COMMA){
 			gl();
-			Peremennaya(temp_type);
+			Peremennaya(param_lex);
 		}
 		if (c_type == LEX_SEMICOLON)
 			gl();
@@ -576,14 +577,14 @@ void Parser::Opisaniya(){
 
 // void Parser::Opisanie(){}
 // void Parser::Tip(){}
-void Parser::Peremennaya(type_of_lex param_type){
+void Parser::Peremennaya(Lex param_lex){
 	if (c_type == LEX_ID){
-		int i=curr_lex.get_value();
-        if (TID[i].get_declare())
-            throw string("Error: Variable ")+ string(TID[i].get_name()) + string(" declared twice!");
+		i1=curr_lex.get_value();
+        if (TID[i1].get_declare())
+            throw string("Error: Variable ")+ string(TID[i1].get_name()) + string(" declared twice!");
         else { 
-            TID[i].put_declare();
-            TID[i].put_type(param_type);
+            TID[i1].put_declare();
+            TID[i1].put_type(param_lex.get_type());
             gl();
         }
     }
@@ -591,44 +592,47 @@ void Parser::Peremennaya(type_of_lex param_type){
 		throw curr_lex;
 	if (c_type == LEX_ASSIGN){
 		gl();
-		Konstanta(param_type);
+		Konstanta(param_lex, i1);
 	}
 }
-void Parser::Konstanta(type_of_lex param_type){
+void Parser::Konstanta(Lex param_lex, int ind){
 	if (c_type == LEX_PLUS || c_type == LEX_MINUS){
+        (c_type == LEX_MINUS)?sign=-1:sign=1;
 		gl();
-        if (param_type == LEX_INT)
-		  Celochislennaya();
+        if (param_lex.get_type() == LEX_INT)
+		  Celochislennaya(ind);
         else
-            throw string("Error: Incorrect initialization of variable with type ") + string(str_lex[param_type]);
+            throw string("Error: Incorrect initialization of variable with type ") + string(str_lex[param_lex.get_type()]);
 	}
 	else if (c_type == LEX_NUM){
-		if (param_type == LEX_INT)
-          Celochislennaya();
+		if (param_lex.get_type() == LEX_INT)
+          Celochislennaya(ind);
         else
-            throw string("Error: Incorrect initialization of variable with type ") + string(str_lex[param_type]);
+            throw string("Error: Incorrect initialization of variable with type ") + string(str_lex[param_lex.get_type()]);
 	}
 	// else if (c_type == LEX_QUOTE){
 	// }
 	else if (c_type == LEX_PHRASE){
-		if (param_type == LEX_STRING)
-          Strokovaya();
+		if (param_lex.get_type() == LEX_STRING)
+          Strokovaya(ind);
         else
-            throw string("Error: Incorrect initialization of variable with type ") + string(str_lex[param_type]);
+            throw string("Error: Incorrect initialization of variable with type ") + string(str_lex[param_lex.get_type()]);
 	}
 	else
 		throw curr_lex;
 }
 
-void Parser::Celochislennaya(){
-	if (c_type == LEX_NUM)
-		gl();
+void Parser::Celochislennaya(int ind){
+	if (c_type == LEX_NUM){
+        TID[ind].put_value(sign*curr_lex.get_value());
+        gl();
+    }
 	else 
 		throw curr_lex;
 }
 
 // void Parser::Znak(){}
-void Parser::Strokovaya(){
+void Parser::Strokovaya(int ind){
 	if (c_type == LEX_PHRASE)
 		gl();
 	else 
@@ -1056,7 +1060,7 @@ void Interpretator::interpretation ()
   cout << endl;
   pars.prog.print();
   cout << endl;
-  E.execute ( pars.prog );
+  // E.execute ( pars.prog );
 }
 
 int main() {
@@ -1075,12 +1079,12 @@ int main() {
  //    	cout << str << endl;
 	// }
 
-// // Проверка работы лексич+семантич анализа и генерации полиза
-// 	Parser pars1("input.txt");
-// 	try {
-// 		pars1.analyze();
-//         pars1.prog.print();
-// 	}
+// Проверка работы лексич+семантич анализа и генерации полиза
+	// Parser pars1("input.txt");
+	// try {
+	// 	pars1.analyze();
+ //        pars1.prog.print();
+	// }
   try
   {
     Interpretator I ("input.txt");
@@ -1109,7 +1113,7 @@ int main() {
 // Ident cid;
 // int i=1;
 //  while (TID[i].get_name()){
-//     cout << TID[i].get_name() << "  " << str_lex[TID[i].get_type()]<< " -> " << TID[i].get_declare() << endl;
+//     cout << TID[i].get_name() << "  " << str_lex[TID[i].get_type()]<< " -> "<< TID[i].get_declare()<< "  " << TID[i].get_value() << endl;
 //     i++;
 // }
 
