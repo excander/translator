@@ -239,7 +239,7 @@ public:
 /////////////////////  Класс Scanner  //////////////////////////////
 
 class Scanner {
-public:
+// public:
     enum state { H, IDENT, NUMB, STRN, ALE, NEQ, COMDEL, COM, ZVZ, DELIM};
     static char* TW[];
     static type_of_lex words[];
@@ -269,7 +269,7 @@ public:
         return 0;
     }
     void gc(){ c = fgetc(fp); }
-// public:
+public:
     Scanner (const char *program){
         fp = fopen(program, "r");
         CS = H;
@@ -280,7 +280,7 @@ public:
 };
 
 char *
-        Scanner::TW[] {"", "program",  "int", "string", "if", "else", "while", "read", "write", "not", "and", "or", "break", "case", "of", "end", "do", NULL};
+        Scanner::TW[] = {"", "program",  "int", "string", "if", "else", "while", "read", "write", "not", "and", "or", "break", "case", "of", "end", "do", NULL};
 
 type_of_lex
         Scanner::words[] {
@@ -293,7 +293,7 @@ type_of_lex
 };
 
 char *
-        Scanner::TD[] { "", "{", "}", ";", ",", "=", "+", "-", "\"", "*", "/", "<", ">", "<=", ">=", "==", "!=", "(", ")", ":", "%", NULL};
+        Scanner::TD[] = { "", "{", "}", ";", ",", "=", "+", "-", "\"", "*", "/", "<", ">", "<=", ">=", "==", "!=", "(", ")", ":", "%", NULL};
 type_of_lex
         Scanner::dlms[] {
         LEX_NULL,
@@ -355,7 +355,6 @@ Scanner::get_lex() {
                     break;
                 }
                 else {
-                    // cout << "delim";
                     CS = DELIM;}
                 break;
 
@@ -491,7 +490,7 @@ class Parser{
 	type_of_lex c_type;
 	int c_val;
     Stack < type_of_lex, 100 >  st_lex;
-	// string str_val; /////////////////// ??
+	// string str_val; //// ??
 	Scanner scan;
 
 	void Programma();
@@ -1056,7 +1055,7 @@ void Executer::execute ( Poliz & prog )
                 cin >> input_str;
                 TPHR[TID[i].get_value()] = input_str;
                 // TID[i].put_value (k);
-                // TID[i].put_assign ();
+                TID[i].put_assign ();
                 break;
             }
         {
