@@ -736,13 +736,14 @@ void Parser::Operator(){
 		else
 			throw curr_lex;
 		Viragenie();
+        prog.put_lex(Lex(LEX_WRITE)); // внутр предст
 		while (c_type == LEX_COMMA){
 			gl();
 			Viragenie();
+            prog.put_lex(Lex(LEX_WRITE)); // внутр предст
 		}
 		if (c_type == LEX_RPAREN){
 			gl();
-            prog.put_lex(Lex(LEX_WRITE)); // внутр предст
         }
 		else
 			throw curr_lex;

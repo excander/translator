@@ -1,5 +1,15 @@
 program {
-int k=-3,e,r=+123,sd,asg;
+int k=-3,e=1,r=+123,sd,asg;
 string s1="aaa", s2, s3="bbb";
-read(asfadgr); 
+if(k==(0-3)) 
+	{e = r*5;
+	write(k>e);}
+else
+	write(s3);
+s2="ccc";
+write(k,e,r, s2+"asd"+s1);
+if((not(123)+5) != 5)
+	write("Sashulka ");
+else
+	write("Sashulka-Kakashulka");
 }
