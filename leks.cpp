@@ -485,7 +485,8 @@ Scanner::get_lex() {
 }
 
 class Parser{
-    int ind, sign = 1;
+    int ind, sign = 1; // для инициализации констант
+    int loop_flag = 0, plb = -1; // для break 
 	Lex curr_lex;
 	type_of_lex c_type;
 	int c_val;
@@ -695,10 +696,16 @@ void Parser::Operator(){
         prog.put_lex(Lex(POLIZ_FGO)); // внутр предст
 		if (c_type == LEX_RPAREN){
 			gl();
+            loop_flag=1;
             Operator();
+            loop_flag=0;
             prog.put_lex(Lex(POLIZ_LABEL, pl0)); // внутр предст
             prog.put_lex(Lex(POLIZ_GO)); // внутр предст
             prog.put_lex(Lex(POLIZ_LABEL, prog.get_free()), pl1); // внутр предст
+            if (plb != -1){  // для break
+                prog.put_lex(Lex(POLIZ_LABEL, prog.get_free()), plb);
+                plb = -1;
+            }
         }
 		else
 			throw curr_lex;
@@ -772,6 +779,20 @@ void Parser::Operator(){
 		else
 			throw curr_lex;
 	}
+    else if (c_type == LEX_BREAK){
+        if (loop_flag == 1) {
+            gl();
+            plb=prog.get_free(); 
+            prog.blank();
+            prog.put_lex(Lex(POLIZ_GO));
+            if (c_type == LEX_SEMICOLON)
+                gl();
+            else
+                throw curr_lex;
+        }
+        else
+            throw "Error: break statement non within loop!";
+    }
 	else
 		OperatorViragenie();
 }
@@ -1163,7 +1184,7 @@ void Executer::execute ( Poliz & prog )
             TID[j].put_value(i);
             TID[j].put_assign(); break;
       default:
-        throw "POLIZ: unexpected elem";
+        throw string("(Poliz) Error: unexpected elem ") + string(str_lex[pc_el.get_type ()]);
     }//end of switch
     ++index;
   };//end of while
@@ -1210,6 +1231,9 @@ int main() {
 	// 	pars1.analyze();
  //        pars1.prog.print();
 	// }
+
+
+
   try
   {
     Interpretator I ("input.txt");

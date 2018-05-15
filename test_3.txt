@@ -1,0 +1,46 @@
+program {
+/*int k=-3,e=1,r=+123,sd,asg;
+string s1="aaa", s2, s3="bbb";
+if(k==(0-3)) 
+	{e = r*5;
+	write(k>e);}
+else
+	write(s3);
+s2="ccc";
+write(k,e,r, s2+"asd"+s1);
+if((not(123)+5) != 5)
+	write("something ");
+else
+	write("something else ", k);*/
+
+string s1, s2 = "ddd", s3 = "abc";
+int x, y;
+int u, i=-3;
+
+/* ___errors:___*/
+/*z=5;
+read(rrr);*/
+
+read(x);
+write(x);
+
+u=5;
+write("int", u+i, u-i, u*i, u/i);
+write("eq", u>i, u>=i, u<i, u<=i, u==i, u!=i);
+
+write("string", s2, s3, s2+s3, s2<s3, s2>s3, s2==s3, s2!=s3);
+
+if (i == 3) {u= 3*5; write("u = ", u);}
+else {u=5; write("u = ", u);}
+
+u=1;
+
+while (u<5)
+{u=u+1;
+write ("u>i ?", u>i);
+}
+read(s1);
+write(s1);
+s1=s1+"asd";
+write(s1);
+}
