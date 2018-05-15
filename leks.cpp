@@ -466,7 +466,7 @@ Scanner::get_lex() {
                 break;
             case DELIM:
                 if (c == '*' || c == '+' || c == '-' || c == '/' || c == ',' ||
-                    c == ';' || c == '(' || c == ')' || c == '{' || c == '}'){
+                    c == ';' || c == '(' || c == ')' || c == '{' || c == '}' || c == '%'){
                     clear();
                     add();
                     gc();
@@ -831,7 +831,7 @@ void Parser::E1 ()
 void Parser::T ()
 {
   F();
-  while ( c_type == LEX_TIMES || c_type == LEX_SLASH || c_type == LEX_AND) {
+  while ( c_type == LEX_TIMES || c_type == LEX_SLASH || c_type == LEX_AND || c_type == LEX_PERCENT) {
     st_lex.push(c_type); // проверка типов в выражении
     gl();
     F();
@@ -1128,6 +1128,15 @@ void Executer::execute ( Poliz & prog )
         if (i)
         {
           args.push(args.pop() / i);
+          break;
+        }
+        else
+          throw "(Poliz) Error: divizion by zero!";
+      case LEX_PERCENT: // +
+        i = args.pop();
+        if (i)
+        {
+          args.push(args.pop() % i);
           break;
         }
         else
