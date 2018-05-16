@@ -696,9 +696,9 @@ void Parser::Operator(){
         prog.put_lex(Lex(POLIZ_FGO)); // внутр предст
 		if (c_type == LEX_RPAREN){
 			gl();
-            loop_flag=1;
+            loop_flag++;
             Operator();
-            loop_flag=0;
+            loop_flag--;
             prog.put_lex(Lex(POLIZ_LABEL, pl0)); // внутр предст
             prog.put_lex(Lex(POLIZ_GO)); // внутр предст
             prog.put_lex(Lex(POLIZ_LABEL, prog.get_free()), pl1); // внутр предст
@@ -780,7 +780,7 @@ void Parser::Operator(){
 			throw curr_lex;
 	}
     else if (c_type == LEX_BREAK){
-        if (loop_flag == 1) {
+        if (loop_flag > 0) {
             gl();
             plb=prog.get_free(); 
             prog.blank();
